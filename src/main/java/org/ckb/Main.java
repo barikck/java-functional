@@ -6,21 +6,21 @@ import org.ckb.combinatorpattern.CustomerValidatorService;
 import org.ckb.combinatorpattern.ValidationResult;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.*;
+
+import static java.util.stream.Collectors.*;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
         List<Person> people = List.of(
-                new Person("Aston", Gender.MALE),
-                new Person("Emily", Gender.FEMALE),
-                new Person("Rose", Gender.FEMALE),
-                new Person("Sam", Gender.MALE),
-                new Person("Thomas", Gender.MALE)
+                new Person("Aston", Gender.MALE, 18),
+                new Person("Emily", Gender.FEMALE, 16),
+                new Person("Rose", Gender.FEMALE, 22),
+                new Person("Sam", Gender.MALE, 21),
+                new Person("Thomas", Gender.MALE, 20)
         );
 
         //Imparative approach
@@ -101,6 +101,24 @@ public class Main {
         List<ValidationResult> failedValidations = CustomerRegValidator.validateCustomer(customer)
                 .stream().filter(r -> !r.equals(ValidationResult.SUCCESS)).toList();
         failedValidations.forEach(System.out::println);
+
+
+        //stream reduce function
+        System.out.println(
+                people.stream()
+                        .reduce(BinaryOperator
+                                .maxBy(Comparator.comparingInt(Person::getAge))
+                        )
+        );
+
+        //grouping
+        Map<Gender, List<Person>> personMapByGender = people.stream()
+                .collect(groupingBy(Person::getGender));
+        System.out.println("personMapByGender = " + personMapByGender);
+
+        Map<Gender, List<String>> mapByGender = people.stream()
+                .collect(groupingBy(Person::getGender, mapping(Person::getName, toList())));
+        System.out.println("mapByGender = " + mapByGender);
 
 
     }
